@@ -1,0 +1,8 @@
+pyproject.toml is the standardized project configuration file for Python (PEP 518 and PEP 621). It’s used by multiple packaging/build tools (Poetry, Flit, Hatch, PDM, modern setuptools, etc.) to declare build-system requirements and project metadata/dependencies.
+
+Quick summary
+
+Purpose: declare build-system and project metadata (dependencies, entry points, build backend).
+Standard: introduced by PEP 518; project table from PEP 621 is the new canonical place for project metadata.
+Who uses it: Poetry, Flit, Hatch, PDM, and modern setuptools all read/write pyproject.toml. It replaces older setup.py and setup.cfg workflows in many projects.
+Not the same as requirements.txt: pyproject.toml describes the package itself (and may list dependencies), while requirements.txt is a flat install list commonly used for pip install
