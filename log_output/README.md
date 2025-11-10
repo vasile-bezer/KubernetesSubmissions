@@ -7,3 +7,6 @@ To run with kubernetes:
 - kubectl create deployment log-output-dep --image=log_output:latest then
 - kubectl edit deployment log-output-dep (set PullPolicy to Never) then
 - kubectl logs -f log-output-dep-58b8759476-rckqz
+To run with manifests:
+- kubectl apply -f manifests/deployment.yaml
+- kubectl logs -f deployment/log-output-dep
