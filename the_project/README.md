@@ -6,9 +6,6 @@ To run with kubernetes:
 - k3d image import the_project:latest then
 - kubectl create deployment the-project-dep --image=the_project:latest then
 - kubectl edit deployment the-project-dep (set PullPolicy to Never) then
-- kubectl logs -f the-project-dep-8668564684-p9zlf
-To run with manifests:
-- kubectl delete deployment the-project-dep
-- k3d image import the_project:latest -c k3s-default
-- kubectl apply -f manifests/deployment.yaml
-- kubectl logs -f deployment/the-project-dep
+- kubectl logs -f the-project-dep-6995b7bb9f-xdbnd
+- kubectl port-forward the-project-dep-6995b7bb9f-xdbnd 3000:3000
+- curl http://localhost:3000/ -> ok
