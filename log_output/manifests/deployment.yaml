@@ -16,3 +16,7 @@ spec:
         - name: log-output
           image: log_output:latest
           imagePullPolicy: IfNotPresent
+#          ports:                   for future reference
+#            - containerPort: 3000  for future reference
+#              name: http           for future reference
+#              protocol: TCP        for future reference

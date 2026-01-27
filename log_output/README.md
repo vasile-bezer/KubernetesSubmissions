@@ -10,3 +10,20 @@ To run with kubernetes:
 To run with manifests:
 - kubectl apply -f manifests/deployment.yaml
 - kubectl logs -f deployment/log-output-dep
+
+## Ingress
+
+(do this after doing Node port in 1.6)
+
+- docker rmi log_output
+- docker build -t log_output ./log_output/
+- k3d image import log_output:latest
+- kubectl apply -f log_output/manifests/deployment.yaml
+- kubectl apply -f log_output/manifests/ingress.yaml
+- kubectl apply -f log_output/manifests/service.yaml
+
+To debug
+- kubectl get ingress log-output-ingress -o yaml
+- kubectl get svc log-output-svc
+- kubectl get ingress
+- kubectl logs -l app=log-output --tail=20
