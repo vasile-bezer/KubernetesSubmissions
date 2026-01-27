@@ -27,3 +27,22 @@ To debug
 - kubectl get svc log-output-svc
 - kubectl get ingress
 - kubectl logs -l app=log-output --tail=20
+
+## Storage
+
+- cd log_output && docker build -f Dockerfile.writer -t log_output_writer:latest . && docker build -f Dockerfile.reader -t log_output_reader:latest .
+- k3d image import log_output_writer:latest log_output_reader:latest
+- kubectl apply -f log_output/manifests/deployment.yaml
+- kubectl rollout status deployment/log-output-dep
+
+
+To debug
+- kubectl logs -l app=log-output -c log-writer --tail=5
+- kubectl logs -l app=log-output -c log-reader --tail=5
+- kubectl get pods -l app=log-output --field-selector=status.phase=Running -o name | head -1 | xargs kubectl logs -c log-writer --tail=5
+- kubectl get pods -l app=log-output --field-selector=status.phase=Running -o name | head -1 | xargs kubectl logs -c log-reader --tail=5
+- kubectl get ingress
+- kubectl port-forward $(kubectl get pod -l app=log-output --field-selector=status.phase=Running -o name | head -1) 9999:3000 &
+- kubectl describe pod $(kubectl get pod -l app=log-output --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}') | grep -A 10 "log-reader"
+- kubectl exec $(kubectl get pod -l app=log-output --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}') -c log-reader -- sh -c 'echo "LOG_FILE=$LOG_FILE PORT=$PORT" && ls -la /app/logs/ && cat /app/logs/output.txt 2>&1 || echo "File not found"'
+- kubectl get deployment log-output-dep -o yaml | grep -A 50 "spec:" | head -60
