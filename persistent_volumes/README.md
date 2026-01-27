@@ -9,3 +9,4 @@
 To debug
 
 - kubectl delete pvc shared-pvc
+- kubectl get pv,pvc

@@ -53,3 +53,9 @@ To debug
 - kubectl apply -f manifests/deployment.yaml
 - kubectl rollout restart deployment/log-output-dep
 - kubectl rollout status deployment/log-output-dep
+
+To debug
+
+- kubectl exec $(kubectl get pod -l app=log-output --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}') -c log-reader -- sh -c 'ls -la /app/data/ && cat /app/data/pingpong_counter.txt 2>&1'
+- kubectl get pods -l app=log-output
+- kubectl exec log-output-dep-5f7b86d9c-qfd82 -c log-reader -- ls -la /app/data/ 2>&1

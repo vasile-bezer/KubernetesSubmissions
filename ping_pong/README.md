@@ -19,3 +19,11 @@
 - kubectl apply -f manifests/deployment.yaml
 - kubectl rollout restart deployment/ping-pong-dep
 - kubectl rollout status deployment/ping-pong-dep
+
+To debug
+
+- kubectl get pods -l app=ping-pong
+- kubectl exec $(kubectl get pod -l app=ping-pong -o jsonpath='{.items[0].metadata.name}') -- ls -la /app/data/ 2>&1
+- kubectl exec ping-pong-dep-7bf6969f88-h7q8n -- cat /app/data/pingpong_counter.txt 2>&1
+- kubectl logs ping-pong-dep-7bf6969f88-h7q8n --tail=20
+- kubectl exec ping-pong-dep-7bf6969f88-h7q8n -- python3 -c "import os; print('Can write:', os.access('/app/data', os.W_OK)); print('Dir exists:', os.path.exists('/app/data'))"
