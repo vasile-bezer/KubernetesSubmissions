@@ -12,3 +12,10 @@
 - kubectl get ingress ping-pong-ingress -o yaml
 - kubectl delete ingress ping-pong-ingress && sleep 2 && kubectl apply -f ping_pong/manifests/ingress.yaml
 - kubectl rollout restart deployment/ping-pong-dep && kubectl rollout status deployment/ping-pong-dep
+
+# Persistency
+
+- cd ping_pong && docker build -t ping_pong:latest .
+- kubectl apply -f manifests/deployment.yaml
+- kubectl rollout restart deployment/ping-pong-dep
+- kubectl rollout status deployment/ping-pong-dep

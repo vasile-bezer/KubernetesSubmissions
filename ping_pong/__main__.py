@@ -5,6 +5,17 @@ import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 counter = 0
+counter_file = "/app/data/pingpong_counter.txt"
+
+
+def write_counter(value):
+	try:
+		os.makedirs(os.path.dirname(counter_file), exist_ok=True)
+		with open(counter_file, 'w') as f:
+			f.write(str(value))
+	except Exception as e:
+		print(f"Error writing file: {e}")
+
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
@@ -15,6 +26,7 @@ class Handler(BaseHTTPRequestHandler):
 		answer = f"pong {counter}\n"
 		self.wfile.write(answer.encode("utf-8"))
 		counter += 1
+		write_counter(counter)
 		return
 
 

@@ -46,3 +46,10 @@ To debug
 - kubectl describe pod $(kubectl get pod -l app=log-output --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}') | grep -A 10 "log-reader"
 - kubectl exec $(kubectl get pod -l app=log-output --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}') -c log-reader -- sh -c 'echo "LOG_FILE=$LOG_FILE PORT=$PORT" && ls -la /app/logs/ && cat /app/logs/output.txt 2>&1 || echo "File not found"'
 - kubectl get deployment log-output-dep -o yaml | grep -A 50 "spec:" | head -60
+
+## Persistency
+
+- cd log_output && docker build -f Dockerfile.writer -t log_output_writer:latest . && docker build -f Dockerfile.reader -t log_output_reader:latest .
+- kubectl apply -f manifests/deployment.yaml
+- kubectl rollout restart deployment/log-output-dep
+- kubectl rollout status deployment/log-output-dep
