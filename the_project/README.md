@@ -18,3 +18,11 @@ To run with kubernetes:
 - kubectl apply -f the_project/manifests/service.yaml
 - kubectl apply -f the_project/manifests/service.yaml
 - curl http://localhost:8082/ -> ok
+
+# Ingress
+
+(do this after Ingress in 1.7)
+
+- kubectl delete ingress log-output-ingress
+- kubectl apply -f the_project/manifests/service.yaml
+- kubectl apply -f the_project/manifests/service.yaml
