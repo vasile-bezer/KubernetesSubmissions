@@ -1,0 +1,44 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.venv
+.git
+.gitignore
+.DS_Store
+/tests
+*.log
+*.sqlite3
+build/
+dist/
+*.egg-info
+.idea
+.vscode
+*.tar
+*.gz
+__pycache__/
+*.swp
+
+# If you generate coverage or virtualenvs
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Local docker files
+docker-compose.yml
+
+# Node modules if present
+node_modules
+
+# Large media or mounts
+media/
+uploads/
+
+# Ignore mounted drives
+/media
+
+# Exclude the Dockerfile itself (optional)
+# !Dockerfile
