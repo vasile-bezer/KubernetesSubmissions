@@ -9,3 +9,12 @@ To run with kubernetes:
 - kubectl logs -f the-project-dep-6995b7bb9f-xdbnd
 - kubectl port-forward the-project-dep-6995b7bb9f-xdbnd 3000:3000
 - curl http://localhost:3000/ -> ok
+
+## Node port
+
+- k3d cluster delete
+- k3d cluster create --port 8082:30080@agent:0 -p 8081:80@loadbalancer --agents 2
+- k3d image import the_project:latest
+- kubectl apply -f the_project/manifests/service.yaml
+- kubectl apply -f the_project/manifests/service.yaml
+- curl http://localhost:8082/ -> ok
