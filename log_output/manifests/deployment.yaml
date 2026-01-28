@@ -16,6 +16,12 @@ spec:
       volumes:
         - name: shared-logs
           emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: log-output-config
+            items:
+              - key: information.txt
+                path: information.txt
       containers:
         - name: log-writer
           image: log_output_writer:latest
@@ -26,9 +32,17 @@ spec:
         - name: log-reader
           image: log_output_reader:latest
           imagePullPolicy: IfNotPresent
+          env:
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-config
+                  key: MESSAGE
           volumeMounts:
             - name: shared-logs
               mountPath: /app/logs
+            - name: config-volume
+              mountPath: /app/config
 #          ports:                   for future reference
 #            - containerPort: 3000  for future reference
 #              name: http           for future reference

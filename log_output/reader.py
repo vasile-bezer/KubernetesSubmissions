@@ -9,17 +9,30 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		log_file = "/app/logs/output.txt"
+		config_file = "/app/config/information.txt"
 		
 		content = "Waiting for log file...\n"
 		try:
+			file_content = ""
+			try:
+				with open(config_file, "r") as f:
+					file_content = f.read().strip()
+			except Exception as e:
+				file_content = f"Error reading config file: {e}"
+			
+			env_message = os.environ.get("MESSAGE", "")
+			
 			with open(log_file, "r") as f:
-				content = f.read().strip()
+				log_content = f.read().strip()
 			
 			ping_pong_count = 0
 			with urllib.request.urlopen("http://ping-pong-svc:1234/pings") as response:
 				ping_pong_count = response.read().decode('utf-8').strip()
 			
-			content = f"{content}\nPing / Pongs: {ping_pong_count}\n"
+			content = f"file content: {file_content}\n"
+			content += f"env variable: MESSAGE={env_message}\n"
+			content += f"{log_content}\n"
+			content += f"Ping / Pongs: {ping_pong_count}\n"
 			
 		except Exception as e:
 			print("Exception:", e)
