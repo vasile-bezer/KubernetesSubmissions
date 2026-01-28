@@ -12,7 +12,14 @@ spec:
       labels:
         app: the-project
     spec:
+      volumes:
+        - name: image-cache
+          persistentVolumeClaim:
+            claimName: shared-pvc
       containers:
         - name: the-project
           image: the_project:latest
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: image-cache
+              mountPath: /app/cache

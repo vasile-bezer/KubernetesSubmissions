@@ -26,3 +26,11 @@ To run with kubernetes:
 - kubectl delete ingress log-output-ingress
 - kubectl apply -f the_project/manifests/service.yaml
 - kubectl apply -f the_project/manifests/service.yaml
+
+# Remove boredom
+
+- cd the_project && docker build -t the_project:latest . && k3d image import the_project:latest
+- kubectl apply -f the_project/manifests/deployment.yaml
+- kubectl rollout status deployment/the-project-dep
+- kubectl delete ingress log-output-ingress
+- kubectl apply -f the_project/manifests/ingress.yaml
