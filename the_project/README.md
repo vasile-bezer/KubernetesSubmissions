@@ -49,3 +49,20 @@ To run with kubernetes:
 To debug
 
 - kubectl describe ingress
+
+
+## Namespaces
+
+- kubectl create namespace project
+
+To debug
+
+- kubectl get pods -n kube-system
+- kubectl get all --all-namespaces
+- kubectl config set-context --current --namespace=<name>
+- kubectl get all -n project
+- kubectl delete deployment log-output-dep ping-pong-dep -n project
+- kubectl delete service,ingress --all -n project
+- kubectl get all,ingress -n project
+- kubectl rollout restart deployment/log-output-dep -n project
+- kubectl get pods -n project
