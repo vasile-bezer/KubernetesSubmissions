@@ -17,3 +17,9 @@ spec:
         - name: todo-backend
           image: the_project_backend:latest
           imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-backend-config
+                  key: PORT

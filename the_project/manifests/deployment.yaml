@@ -21,6 +21,27 @@ spec:
         - name: the-project
           image: the_project:latest
           imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: PORT
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: BACKEND_URL
+            - name: IMAGE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: IMAGE_URL
+            - name: IMAGE_CACHE_MINUTES
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: IMAGE_CACHE_MINUTES
           volumeMounts:
             - name: image-cache
               mountPath: /app/cache

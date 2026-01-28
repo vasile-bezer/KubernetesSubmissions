@@ -11,6 +11,9 @@ import base64
 image_file = "/app/cache/current_image.jpg"
 last_download_time = 0
 
+IMAGE_URL = os.environ.get("IMAGE_URL", "https://picsum.photos/1200")
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8081/todos")
+
 
 def download_new_image():
 	"""download a image"""
@@ -19,7 +22,7 @@ def download_new_image():
 	try:
 		os.makedirs(os.path.dirname(image_file), exist_ok=True)
 		
-		url_with_random = f"https://picsum.photos/1200?random={int(time.time())}"
+		url_with_random = f"{IMAGE_URL}?random={int(time.time())}"
 		print(f"Downloading new image from {url_with_random}")
 		
 		with urllib.request.urlopen(url_with_random, timeout=10) as response:
@@ -98,7 +101,7 @@ class Handler(BaseHTTPRequestHandler):
 			const todoInput = document.getElementById('todo-input');
 			const sendButton = document.getElementById('create-todo');
 			const todoList = document.getElementById('todo-list');
-			const BACKEND_URL = 'http://localhost:8081/todos';
+			const BACKEND_URL = '{BACKEND_URL}';
 			
 			function loadTodos() {{
 				fetch(BACKEND_URL)
