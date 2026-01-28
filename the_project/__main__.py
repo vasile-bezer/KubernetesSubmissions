@@ -11,12 +11,6 @@ import base64
 image_file = "/app/cache/current_image.jpg"
 last_download_time = 0
 
-todos = [
-	"Complete DevOps with Kubernetes chapter 2",
-	"Complete DevOps with Kubernetes chapter 3",
-	"Complete DevOps with Kubernetes chapter 4",
-]
-
 
 def download_new_image():
 	"""download a image"""
@@ -72,10 +66,6 @@ class Handler(BaseHTTPRequestHandler):
 		
 		image_base64 = base64.b64encode(get_image()).decode('utf-8')
 		
-		todos_html = ""
-		for todo in todos:
-			todos_html += f"<li>{todo}</li>\n"
-		
 		html_content = f"""<!DOCTYPE html>
 <html>
 	<head>
@@ -92,14 +82,12 @@ class Handler(BaseHTTPRequestHandler):
 				<div class="todo-input-container">
 					<input 
 						type="text" 
-						id="todo-input" 
-						maxlength="140"
+						id="todo-input"
 					>
 					<button id="create-todo">Create todo</button>
 				</div>
 				
 				<ul id="todo-list">
-					{todos_html}
 				</ul>
 			</div>
 			
@@ -109,35 +97,57 @@ class Handler(BaseHTTPRequestHandler):
 		<script>
 			const todoInput = document.getElementById('todo-input');
 			const sendButton = document.getElementById('create-todo');
-			const charCount = document.getElementById('char-count');
-			const charCounter = document.querySelector('.char-counter');
 			const todoList = document.getElementById('todo-list');
+			const BACKEND_URL = 'http://localhost:8081/todos';
 			
-			todoInput.addEventListener('input', function() {{
-				const length = this.value.length;
-				charCount.textContent = length;
-				
-				if (length > 140) {{
-					charCounter.classList.add('error');
-					sendButton.disabled = true;
-				}} else {{
-					charCounter.classList.remove('error');
-					sendButton.disabled = length === 0;
-				}}
-			}});
+			function loadTodos() {{
+				fetch(BACKEND_URL)
+					.then(response => response.json())
+					.then(todos => {{
+						todoList.innerHTML = '';
+						todos.forEach(todo => {{
+							const li = document.createElement('li');
+							li.textContent = todo.text;
+							todoList.appendChild(li);
+						}});
+					}})
+					.catch(error => {{
+						console.error('Error loading todos:', error);
+					}});
+			}}
 			
 			sendButton.addEventListener('click', function() {{
 				const todo = todoInput.value.trim();
-				if (todo && todo.length <= 140) {{
-					const li = document.createElement('li');
-					li.textContent = todo;
-					todoList.appendChild(li);
-					
-					todoInput.value = '';
-					charCount.textContent = '0';
-					sendButton.disabled = true;
+				if (todo) {{
+					fetch(BACKEND_URL, {{
+						method: 'POST',
+						headers: {{
+							'Content-Type': 'application/json'
+						}},
+						body: JSON.stringify({{ todo: todo }})
+					}})
+					.then(response => {{
+						if (response.ok) {{
+							todoInput.value = '';
+							sendButton.disabled = true;
+							loadTodos();
+						}} else {{
+							return response.text().then(text => {{
+								console.error('Error creating todo:', text);
+							}});
+						}}
+					}})
+					.catch(error => {{
+						console.error('Error creating todo:', error);
+					}});
 				}}
 			}});
+			
+			todoInput.addEventListener('input', function() {{
+				sendButton.disabled = this.value.trim().length === 0;
+			}});
+			
+			loadTodos();
 		</script>
 	</body>
 </html>"""

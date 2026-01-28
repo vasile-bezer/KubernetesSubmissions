@@ -39,3 +39,13 @@ To run with kubernetes:
 
 - cd the_project && docker build -t the_project:latest . && k3d image import the_project:latest
 - kubectl rollout restart deployment/the-project-dep
+
+## Todo app backend
+
+- cd the_project && docker build -t the_project:latest . && k3d image import the_project:latest
+- kubectl rollout restart deployment/the-project-dep
+- kubectl apply -f ./manifests/ingress.yaml
+
+To debug
+
+- kubectl describe ingress
