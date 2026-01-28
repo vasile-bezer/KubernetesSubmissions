@@ -74,3 +74,25 @@ To debug
 - kubectl edit deployment log-output-dep
 - kubectl delete -f manifests/deployment.yaml
 - docker exec k3d-k3s-default-agent-0 crictl images
+
+## Namespaces
+
+- kubectl create namespace exercises
+
+To debug
+
+- kubectl get pods -n kube-system
+- kubectl get all --all-namespaces
+- kubectl config set-context --current --namespace=<name>
+- kubectl get all -n exercises
+- kubectl delete deployment log-output-dep ping-pong-dep -n exercises
+- kubectl delete service,ingress --all -n exercises
+- kubectl get all,ingress -n exercises
+- kubectl rollout restart deployment/log-output-dep -n exercises
+- kubectl get pods -n exercises
+
+To create a new namespace for the app
+
+- kubectl delete deployment log-output-dep ping-pong-dep -n log-output-namespace
+- kubectl delete service,ingress --all -n log-output-namespace
+- 
