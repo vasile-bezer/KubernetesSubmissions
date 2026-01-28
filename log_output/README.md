@@ -59,3 +59,18 @@ To debug
 - kubectl exec $(kubectl get pod -l app=log-output --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}') -c log-reader -- sh -c 'ls -la /app/data/ && cat /app/data/pingpong_counter.txt 2>&1'
 - kubectl get pods -l app=log-output
 - kubectl exec log-output-dep-5f7b86d9c-qfd82 -c log-reader -- ls -la /app/data/ 2>&1
+
+## Connecting pods
+
+- cd log_output && docker build -f Dockerfile.reader -t log_output_reader:latest . && k3d image import log_output_reader:latest
+- k3d image import log_output_writer:latest
+- kubectl apply -f manifests/deployment.yaml
+- kubectl rollout restart deployment/log-output-dep
+- kubectl rollout status deployment/log-output-dep
+
+To debug
+
+- kubectl delete pod log-output-dep-76cd79b84-sj4ct
+- kubectl edit deployment log-output-dep
+- kubectl delete -f manifests/deployment.yaml
+- docker exec k3d-k3s-default-agent-0 crictl images

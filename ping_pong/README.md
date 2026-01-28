@@ -27,3 +27,10 @@ To debug
 - kubectl exec ping-pong-dep-7bf6969f88-h7q8n -- cat /app/data/pingpong_counter.txt 2>&1
 - kubectl logs ping-pong-dep-7bf6969f88-h7q8n --tail=20
 - kubectl exec ping-pong-dep-7bf6969f88-h7q8n -- python3 -c "import os; print('Can write:', os.access('/app/data', os.W_OK)); print('Dir exists:', os.path.exists('/app/data'))"
+
+## Connecting pods
+
+- cd ping_pong && docker build -f Dockerfile -t ping_pong:latest . && k3d image import ping_pong:latest
+- kubectl apply -f manifests/deployment.yaml
+- kubectl rollout restart deployment/ping-pong-dep
+- kubectl rollout status deployment/ping-pong-dep

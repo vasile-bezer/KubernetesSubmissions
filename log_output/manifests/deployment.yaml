@@ -15,9 +15,6 @@ spec:
       volumes:
         - name: shared-logs
           emptyDir: {}
-        - name: shared-data
-          persistentVolumeClaim:
-            claimName: shared-pvc
       containers:
         - name: log-writer
           image: log_output_writer:latest
@@ -31,8 +28,6 @@ spec:
           volumeMounts:
             - name: shared-logs
               mountPath: /app/logs
-            - name: shared-data
-              mountPath: /app/data
 #          ports:                   for future reference
 #            - containerPort: 3000  for future reference
 #              name: http           for future reference

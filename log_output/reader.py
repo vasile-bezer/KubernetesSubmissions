@@ -2,13 +2,13 @@
 
 import sys
 import os
+import urllib.request
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		log_file = "/app/logs/output.txt"
-		counter_file = "/app/data/pingpong_counter.txt"
 		
 		content = "Waiting for log file...\n"
 		try:
@@ -16,9 +16,8 @@ class Handler(BaseHTTPRequestHandler):
 				content = f.read().strip()
 			
 			ping_pong_count = 0
-			if os.path.exists(counter_file):
-				with open(counter_file, "r") as f:
-					ping_pong_count = f.read().strip()
+			with urllib.request.urlopen("http://ping-pong-svc:1234/pings") as response:
+				ping_pong_count = response.read().decode('utf-8').strip()
 			
 			content = f"{content}\nPing / Pongs: {ping_pong_count}\n"
 			
@@ -31,9 +30,6 @@ class Handler(BaseHTTPRequestHandler):
 		self.end_headers()
 		self.wfile.write(content.encode())
 	
-	def log_message(self, format, *args):
-		# Suppress HTTP request logs
-		pass
 
 def main():
 	"""main function"""
