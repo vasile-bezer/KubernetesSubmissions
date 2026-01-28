@@ -34,3 +34,8 @@ To run with kubernetes:
 - kubectl rollout status deployment/the-project-dep
 - kubectl delete ingress log-output-ingress
 - kubectl apply -f the_project/manifests/ingress.yaml
+
+# Add todo list
+
+- cd the_project && docker build -t the_project:latest . && k3d image import the_project:latest
+- kubectl rollout restart deployment/the-project-dep

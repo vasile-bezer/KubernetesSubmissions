@@ -11,6 +11,12 @@ import base64
 image_file = "/app/cache/current_image.jpg"
 last_download_time = 0
 
+todos = [
+	"Complete DevOps with Kubernetes chapter 2",
+	"Complete DevOps with Kubernetes chapter 3",
+	"Complete DevOps with Kubernetes chapter 4",
+]
+
 
 def download_new_image():
 	"""download a image"""
@@ -65,6 +71,11 @@ class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		
 		image_base64 = base64.b64encode(get_image()).decode('utf-8')
+		
+		todos_html = ""
+		for todo in todos:
+			todos_html += f"<li>{todo}</li>\n"
+		
 		html_content = f"""<!DOCTYPE html>
 <html>
 	<head>
@@ -72,9 +83,62 @@ class Handler(BaseHTTPRequestHandler):
 		<title>The Project App</title>
 	</head>
 	<body>
-		<h1>The project App</h1>
-		<img src="data:image/jpeg;base64,{image_base64}" alt="Random Image">
-		<footer>DevOps with Kubernetes 2025</footer>
+		<div class="container">
+			<h1>The project App</h1>
+			<img src="data:image/jpeg;base64,{image_base64}" alt="Random Image">
+			
+			<div class="todo-section">
+				<h2>Todos</h2>
+				<div class="todo-input-container">
+					<input 
+						type="text" 
+						id="todo-input" 
+						maxlength="140"
+					>
+					<button id="create-todo">Create todo</button>
+				</div>
+				
+				<ul id="todo-list">
+					{todos_html}
+				</ul>
+			</div>
+			
+			<footer>DevOps with Kubernetes 2025</footer>
+		</div>
+		
+		<script>
+			const todoInput = document.getElementById('todo-input');
+			const sendButton = document.getElementById('create-todo');
+			const charCount = document.getElementById('char-count');
+			const charCounter = document.querySelector('.char-counter');
+			const todoList = document.getElementById('todo-list');
+			
+			todoInput.addEventListener('input', function() {{
+				const length = this.value.length;
+				charCount.textContent = length;
+				
+				if (length > 140) {{
+					charCounter.classList.add('error');
+					sendButton.disabled = true;
+				}} else {{
+					charCounter.classList.remove('error');
+					sendButton.disabled = length === 0;
+				}}
+			}});
+			
+			sendButton.addEventListener('click', function() {{
+				const todo = todoInput.value.trim();
+				if (todo && todo.length <= 140) {{
+					const li = document.createElement('li');
+					li.textContent = todo;
+					todoList.appendChild(li);
+					
+					todoInput.value = '';
+					charCount.textContent = '0';
+					sendButton.disabled = true;
+				}}
+			}});
+		</script>
 	</body>
 </html>"""
 			
