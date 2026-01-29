@@ -20,7 +20,7 @@ spec:
       containers:
         - name: the-project
           image: the_project:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           env:
             - name: PORT
               valueFrom:

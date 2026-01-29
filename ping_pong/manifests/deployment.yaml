@@ -16,7 +16,7 @@ spec:
       containers:
         - name: ping-pong
           image: ping_pong:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           env:
             - name: POSTGRES_HOST
               value: "postgres-svc.exercises.svc.cluster.local"
