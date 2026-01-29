@@ -4,6 +4,7 @@ metadata:
   name: the-project-config
   namespace: project
 data:
-  BACKEND_URL: "http://localhost:8081/todos"
+  BACKEND_URL: "/todos"
   IMAGE_URL: "https://picsum.photos/1200"
+  IMAGE_CACHE_MINUTES: "10"
   PORT: "3000"

@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wikipedia-todo-cron
+  namespace: project
+spec:
+  # Run every hour
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: wikipedia-todo
+            image: wikipedia-cron:latest
+            imagePullPolicy: Never
+            env:
+            - name: BACKEND_URL
+              value: "http://todo-backend-svc.project.svc.cluster.local:2345/todos"
+          restartPolicy: OnFailure
