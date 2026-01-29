@@ -3,19 +3,53 @@
 import sys
 import os
 import json
+import psycopg2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-todos = [
-	{"id": 1, "text": "Complete DevOps with Kubernetes chapter 2"},
-	{"id": 2, "text": "Complete DevOps with Kubernetes chapter 3"},
-	{"id": 3, "text": "Complete DevOps with Kubernetes chapter 4"},
-]
-next_id = 4
+
+def get_db_connection():
+	return psycopg2.connect(
+		host=os.environ.get("POSTGRES_HOST", "todo-db-svc.project.svc.cluster.local"),
+		database=os.environ.get("POSTGRES_DB", "tododb"),
+		user=os.environ.get("POSTGRES_USER", "todouser"),
+		password=os.environ.get("POSTGRES_PASSWORD", "todopassword")
+	)
+
+
+def get_todos():
+	try:
+		conn = get_db_connection()
+		cur = conn.cursor()
+		cur.execute("SELECT id, text FROM todos ORDER BY id")
+		rows = cur.fetchall()
+		cur.close()
+		conn.close()
+		return [{"id": row[0], "text": row[1]} for row in rows]
+	except Exception as e:
+		print(f"Error getting todos: {e}")
+		return []
+
+
+def add_todo(text):
+	try:
+		conn = get_db_connection()
+		cur = conn.cursor()
+		cur.execute("INSERT INTO todos (text) VALUES (%s) RETURNING id, text", (text,))
+		row = cur.fetchone()
+		conn.commit()
+		cur.close()
+		conn.close()
+		return {"id": row[0], "text": row[1]} if row else None
+	except Exception as e:
+		print(f"Error adding todo: {e}")
+		return None
+
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		
 		if self.path == "/todos":
+			todos = get_todos()
 			self.send_response(200)
 			self.send_header("Content-Type", "application/json")
 			self.send_header("Access-Control-Allow-Origin", "*")
@@ -25,7 +59,6 @@ class Handler(BaseHTTPRequestHandler):
 			return
 	
 	def do_POST(self):
-		global next_id
 		
 		if self.path == "/todos":
 			try:
@@ -50,21 +83,24 @@ class Handler(BaseHTTPRequestHandler):
 					response = json.dumps({"error": "Todo must be 140 characters or less"})
 					self.wfile.write(response.encode('utf-8'))
 				else:
-					new_todo = {
-						"id": next_id,
-						"text": todo_text
-					}
-					todos.append(new_todo)
-					next_id += 1
+					new_todo = add_todo(todo_text)
 					
-					print(f"Added todo: {todo_text}")
-					
-					self.send_response(201)
-					self.send_header("Content-Type", "application/json")
-					self.send_header("Access-Control-Allow-Origin", "*")
-					self.end_headers()
-					response = json.dumps(new_todo)
-					self.wfile.write(response.encode('utf-8'))
+					if new_todo:
+						print(f"Added todo: {todo_text}")
+						
+						self.send_response(201)
+						self.send_header("Content-Type", "application/json")
+						self.send_header("Access-Control-Allow-Origin", "*")
+						self.end_headers()
+						response = json.dumps(new_todo)
+						self.wfile.write(response.encode('utf-8'))
+					else:
+						self.send_response(500)
+						self.send_header("Content-Type", "application/json")
+						self.send_header("Access-Control-Allow-Origin", "*")
+						self.end_headers()
+						response = json.dumps({"error": "Failed to add todo"})
+						self.wfile.write(response.encode('utf-8'))
 			except Exception as e:
 				print(f"Error processing POST: {e}")
 				self.send_response(500)

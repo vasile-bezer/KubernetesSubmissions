@@ -5,3 +5,5 @@ metadata:
   namespace: project
 data:
   PORT: "3001"
+  POSTGRES_HOST: "todo-db-svc.project.svc.cluster.local"
+  POSTGRES_DB: "tododb"
