@@ -2,17 +2,54 @@
 
 import sys
 import os
+import psycopg2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-counter = 0
+
+def get_db_connection():
+	return psycopg2.connect(
+		host=os.environ.get("POSTGRES_HOST", "postgres-svc.exercises.svc.cluster.local"),
+		database=os.environ.get("POSTGRES_DB", "pingpong"),
+		user=os.environ.get("POSTGRES_USER", "postgres"),
+		password=os.environ.get("POSTGRES_PASSWORD", "postgres")
+	)
+
+
+def get_counter():
+	try:
+		conn = get_db_connection()
+		cur = conn.cursor()
+		cur.execute("SELECT value FROM counter WHERE id = 1")
+		result = cur.fetchone()
+		cur.close()
+		conn.close()
+		return result[0] if result else 0
+	except Exception as e:
+		print(f"Error getting counter: {e}")
+		return 0
+
+
+def increment_counter():
+	try:
+		conn = get_db_connection()
+		cur = conn.cursor()
+		cur.execute("UPDATE counter SET value = value + 1 WHERE id = 1 RETURNING value")
+		result = cur.fetchone()
+		conn.commit()
+		cur.close()
+		conn.close()
+		return result[0] if result else 0
+	except Exception as e:
+		print(f"Error incrementing counter: {e}")
+		return 0
 
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
-		global counter
 		
 		# Endpoint to just get the counter value without incrementing
 		if self.path == "/pings":
+			counter = get_counter()
 			self.send_response(200)
 			self.send_header("Content-Type", "text/plain; charset=utf-8")
 			self.end_headers()
@@ -20,12 +57,12 @@ class Handler(BaseHTTPRequestHandler):
 			return
 		
 		# Default endpoint - increment and return pong
+		counter = increment_counter()
 		self.send_response(200)
 		self.send_header("Content-Type", "text/plain; charset=utf-8")
 		self.end_headers()
 		answer = f"pong {counter}\n"
 		self.wfile.write(answer.encode("utf-8"))
-		counter += 1
 		return
 
 
