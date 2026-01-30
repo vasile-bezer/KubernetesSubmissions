@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init
+  namespace: exercises
+spec:
+  template:
+    spec:
+      containers:
+        - name: postgres-init
+          image: postgres:13
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until pg_isready -h postgres-svc.exercises.svc.cluster.local -p 5432 -U postgres; do
+                echo "Waiting for PostgreSQL to be ready..."
+                sleep 2
+              done
+              echo "PostgreSQL is ready!"
+              
+              PGPASSWORD=postgres psql -h postgres-svc.exercises.svc.cluster.local -U postgres -d pingpong -c "
+                CREATE TABLE IF NOT EXISTS counter (
+                  id INTEGER PRIMARY KEY,
+                  value INTEGER NOT NULL
+                );
+                INSERT INTO counter (id, value) VALUES (1, 0)
+                ON CONFLICT (id) DO NOTHING;
+              "
+              
+              echo "Database initialized successfully!"
+      restartPolicy: Never
+  backoffLimit: 4

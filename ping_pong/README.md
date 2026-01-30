@@ -34,3 +34,17 @@ To debug
 - kubectl apply -f manifests/deployment.yaml
 - kubectl rollout restart deployment/ping-pong-dep
 - kubectl rollout status deployment/ping-pong-dep
+
+## GKE
+
+- gcloud config set project dwk-gke-485823
+- gcloud container clusters create dwk-cluster --zone=europe-north1-b --cluster-version=1.32 --disk-size=32 --num-nodes=3 --machine-type=e2-micro
+- sudo apt-get install google-cloud-cli-gke-gcloud-auth-plugin
+- cloud container clusters get-credentials dwk-cluster --zone europe-north1-b --project dwk-gke-485823
+- kubectl get nodes
+- kubectl cluster-info
+- kubectl create namespace exercises
+- cd ping_pong && docker build -t gcr.io/dwk-gke-485823/ping-pong:latest .
+- gcloud auth configure-docker
+- kubectl apply -f ping_pong/manifests-gke
+- curl http://35.228.175.222/pingpong
