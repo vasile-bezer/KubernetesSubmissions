@@ -47,7 +47,7 @@ def get_image():
 	
 	age = time.time() - last_download_time if last_download_time > 0 else float('inf')
 	
-	if age > 10 * 60:
+	if age > 2 * 60:
 		print(f"Cache expired (age: {age:.1f}s), downloading new image")
 		new_image = download_new_image()
 		if new_image:
