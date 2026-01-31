@@ -66,3 +66,30 @@ To debug
 - kubectl get all,ingress -n project
 - kubectl rollout restart deployment/log-output-dep -n project
 - kubectl get pods -n project
+
+## Kustomize
+
+Build and push images:
+- cd the_project && docker build -t europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project:latest . && docker push europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project:latest
+- cd the_project_backend && docker build -t europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project-backend:latest . && docker push europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project-backend:latest
+
+Deploy to GKE with Kustomize:
+- kubectl apply -k .
+- kubectl get gateway -n project
+- kubectl get httproute -n project
+- kubectl get pods -n project
+
+Access the app:
+- Get Gateway IP: kubectl get gateway the-project-gateway -n project -o jsonpath='{.status.addresses[0].value}'
+- Frontend: http://34.111.231.229/
+- Backend API: http://34.111.231.229/todos
+
+To update:
+- kubectl rollout restart deployment/the-project-dep -n project
+- kubectl rollout restart deployment/todo-backend-dep -n project
+
+To debug:
+- kubectl describe gateway the-project-gateway -n project
+- kubectl describe httproute the-project-route -n project
+- kubectl logs -n project deployment/todo-backend-dep
+- gcloud compute backend-services get-health <backend-service-name> --global
