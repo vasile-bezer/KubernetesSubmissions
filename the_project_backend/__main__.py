@@ -47,6 +47,13 @@ def add_todo(text):
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
+		# Health check endpoint for GKE load balancer
+		if self.path == "/" or self.path == "/healthz":
+			self.send_response(200)
+			self.send_header("Content-Type", "text/plain")
+			self.end_headers()
+			self.wfile.write(b"OK")
+			return
 		
 		if self.path == "/todos":
 			todos = get_todos()

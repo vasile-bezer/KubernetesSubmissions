@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: the-project-dep
+  namespace: project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: the-project
+  template:
+    metadata:
+      labels:
+        app: the-project
+    spec:
+      volumes:
+        - name: image-cache
+          persistentVolumeClaim:
+            claimName: shared-pvc
+      containers:
+        - name: the-project
+          image: europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project-frontend:latest
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: PORT
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: BACKEND_URL
+            - name: IMAGE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: IMAGE_URL
+            - name: IMAGE_CACHE_MINUTES
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: IMAGE_CACHE_MINUTES
+          volumeMounts:
+            - name: image-cache
+              mountPath: /app/cache
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10

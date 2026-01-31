@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: project
+
+resources:
+  # Frontend manifests
+  - manifests-gke/deployment.yaml
+  - manifests-gke/service.yaml
+  - manifests-gke/configmap.yaml
+  - manifests-gke/persistentvolumeclaim.yaml
+  - manifests-gke/gateway.yaml
+  - manifests-gke/route.yaml
+  
+  # Backend manifests
+  - ../the_project_backend/manifests-gke/deployment.yaml
+  - ../the_project_backend/manifests-gke/service.yaml
+  - ../the_project_backend/manifests-gke/configmap.yaml
+  - ../the_project_backend/manifests-gke/secret.yaml
+  - ../the_project_backend/manifests-gke/postgres-statefulset.yaml
+  - ../the_project_backend/manifests-gke/postgres-init.yaml
+
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+  project: the-project
