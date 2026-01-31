@@ -97,7 +97,7 @@ To create a new namespace for the app
 - kubectl delete service,ingress --all -n log-output-namespace
 - 
 
- # Gateway API
+## Gateway API
 
 - $ gcloud container clusters update dwk-cluster --location=europe-north1-b --gateway-api=standard
 - kubectl delete -f log_output/manifests-gke/ingress.yaml
@@ -109,3 +109,10 @@ To debug
 
 - kubectl get gatewayclass
 - kubectl describe gateway my-gateway -n exercises
+
+## Rewritten routing
+
+- cd ping_pong && docker build -t europe-north1-docker.pkg.dev/dwk-gke-485823/ping-pong/ping-pong:latest .
+- docker push europe-north1-docker.pkg.dev/dwk-gke-485823/ping-pong/ping-pong:latest
+- kubectl apply -f /home/percy/Scrivania/KubernetesSubmissions/log_output/manifests-gke/route.yaml
+- kubectl rollout restart deployment ping-pong-dep -n exercises
