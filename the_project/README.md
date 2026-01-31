@@ -125,12 +125,6 @@ GitHub Secrets (in "the_project" environment):
 - Example: feature-branch deploys to namespace "feature-branch"
 - Branch names must be valid Kubernetes namespace names
 
-Automatic cleanup:
-- Deleting a branch triggers automatic cleanup workflow
-- Deletes the namespace and all resources (Gateway, deployments, services, etc.)
-- main branch namespace (project) is protected from deletion
-- Workflow: .github/workflows/cleanup.yaml
-
 
 
 # Test branch deployment

@@ -12,13 +12,13 @@ spec:
         - -c
         - |
           echo "Waiting for PostgreSQL to be ready..."
-          until pg_isready -h todo-db-svc -U ${POSTGRES_USER}; do
+          until pg_isready -h todo-db-svc.project.svc.cluster.local -U ${POSTGRES_USER}; do
             echo "PostgreSQL is unavailable - sleeping"
             sleep 2
           done
           echo "PostgreSQL is ready!"
           echo "Creating todos table..."
-          psql -h todo-db-svc -U ${POSTGRES_USER} -d ${POSTGRES_DB} <<-EOSQL
+          psql -h todo-db-svc.project.svc.cluster.local -U ${POSTGRES_USER} -d ${POSTGRES_DB} <<-EOSQL
             CREATE TABLE IF NOT EXISTS todos (
               id SERIAL PRIMARY KEY,
               text TEXT NOT NULL,
