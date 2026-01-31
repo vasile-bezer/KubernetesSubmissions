@@ -93,3 +93,25 @@ To debug:
 - kubectl describe httproute the-project-route -n project
 - kubectl logs -n project deployment/todo-backend-dep
 - gcloud compute backend-services get-health <backend-service-name> --global
+
+## Automatic deployment
+
+Setup scripts (easier):
+- bash setup-github-actions.sh
+- bash setup-workload-identity.sh
+
+Or manual setup:
+- gcloud iam service-accounts create github-actions --display-name="GitHub Actions" --project=dwk-gke-485823
+- gcloud projects add-iam-policy-binding dwk-gke-485823 --member="serviceAccount:<service-account-email>" --role="roles/container.developer"
+- gcloud projects add-iam-policy-binding dwk-gke-485823 --member="serviceAccount:<service-account-email>" --role="roles/artifactregistry.writer"
+- gcloud projects add-iam-policy-binding dwk-gke-485823 --member="serviceAccount:<service-account-email>" --role="roles/storage.admin"
+- gcloud iam workload-identity-pools create github-actions-pool --location=global --display-name="GitHub Actions Pool" --project=dwk-gke-485823
+- gcloud iam workload-identity-pools providers create-oidc github-actions-provider --workload-identity-pool=github-actions-pool --location=global --issuer-uri="https://token.actions.githubusercontent.com" --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" --attribute-condition="assertion.repository_owner=='<repo-owner>'" --project=dwk-gke-485823
+- gcloud iam service-accounts add-iam-policy-binding <service-account-email> --project=dwk-gke-485823 --role="roles/iam.workloadIdentityUser" --member="principalSet://iam.googleapis.com/projects/<GCP Project Number>/locations/global/workloadIdentityPools/github-actions-pool/attribute.repository/<repo-owner>/KubernetesSubmissions"
+
+GitHub Secrets (in "the_project" environment):
+- WIF_PROVIDER: gcloud iam workload-identity-pools providers describe github-actions-provider --workload-identity-pool=github-actions-pool --location=global --project=<PROJECT_ID> --format="value(name)"
+- GKE_PROJECT: gcloud config get-value project
+- GKE_SA_EMAIL: gcloud iam service-accounts list --filter="displayName:GitHub Actions" --format="value(email)"
+
+

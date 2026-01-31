@@ -1,0 +1,95 @@
+name: Release application
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+  REGISTRY: europe-north1-docker.pkg.dev
+  REPOSITORY: the-project
+  FRONTEND_IMAGE: the-project-frontend
+  BACKEND_IMAGE: the-project-backend
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish and Deploy
+    runs-on: ubuntu-latest
+    environment: the_project
+    
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.GKE_SA_EMAIL }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Use gcloud CLI
+        run: gcloud info
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud --quiet auth configure-docker ${{ env.REGISTRY }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: '${{ env.GKE_CLUSTER }}'
+          project_id: '${{ env.PROJECT_ID }}'
+          location: '${{ env.GKE_ZONE }}'
+
+      - name: Build frontend image
+        run: |-
+          docker build \
+            --tag "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:${GITHUB_SHA}" \
+            --tag "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:latest" \
+            ./the_project
+
+      - name: Build backend image
+        run: |-
+          docker build \
+            --tag "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:${GITHUB_SHA}" \
+            --tag "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:latest" \
+            ./the_project_backend
+
+      - name: Push frontend image
+        run: |-
+          docker push "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:${GITHUB_SHA}"
+          docker push "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:latest"
+
+      - name: Push backend image
+        run: |-
+          docker push "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:${GITHUB_SHA}"
+          docker push "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:latest"
+
+      - name: Deploy to GKE with Kustomize
+        run: |-
+          kubectl apply -k .
+
+      - name: Restart frontend deployment
+        run: |-
+          kubectl rollout restart deployment/the-project-dep -n project
+          kubectl rollout status deployment/the-project-dep -n project --timeout=5m
+
+      - name: Restart backend deployment
+        run: |-
+          kubectl rollout restart deployment/todo-backend-dep -n project
+          kubectl rollout status deployment/todo-backend-dep -n project --timeout=5m
+
+      - name: Verify deployment
+        run: |-
+          kubectl get pods -n project
+          kubectl get gateway -n project
+          kubectl get httproute -n project
