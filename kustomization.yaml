@@ -20,6 +20,14 @@ resources:
   - the_project_backend/manifests-gke/postgres-statefulset.yaml
   - the_project_backend/manifests-gke/postgres-init.yaml
 
+images:
+  - name: the-project-frontend
+    newName: europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project-frontend
+    newTag: latest
+  - name: the-project-backend
+    newName: europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project-backend
+    newTag: latest
+
 labels:
   - pairs:
       app.kubernetes.io/managed-by: kustomize

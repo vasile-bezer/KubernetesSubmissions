@@ -114,4 +114,16 @@ GitHub Secrets (in "the_project" environment):
 - GKE_PROJECT: gcloud config get-value project
 - GKE_SA_EMAIL: gcloud iam service-accounts list --filter="displayName:GitHub Actions" --format="value(email)"
 
+## Each branch creates a separate environment
+
+- Push to any branch triggers automatic deployment
+- main branch deploys to namespace: project
+- Other branches deploy to namespace: <branch-name>
+- Each branch gets its own isolated environment with separate Gateway
+- Images are built with commit SHA tags
+- Kustomize automatically updates namespace and images using: kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+- Example: feature-branch deploys to namespace "feature-branch"
+- Branch names must be valid Kubernetes namespace names
+
+
 

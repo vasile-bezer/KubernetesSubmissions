@@ -21,7 +21,7 @@ spec:
             claimName: shared-pvc
       containers:
         - name: the-project
-          image: europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project-frontend:latest
+          image: the-project-frontend
           imagePullPolicy: Always
           env:
             - name: PORT

@@ -3,7 +3,7 @@ name: Release application
 on:
   push:
     branches:
-      - main
+      - '*'
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -74,22 +74,15 @@ jobs:
           docker push "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:${GITHUB_SHA}"
           docker push "${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:latest"
 
-      - name: Deploy to GKE with Kustomize
+      - name: Deploy
         run: |-
-          kubectl apply -k .
+          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
+          kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
+          kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+          kustomize edit set image the-project-frontend=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.FRONTEND_IMAGE }}:${GITHUB_SHA}
+          kustomize edit set image the-project-backend=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.BACKEND_IMAGE }}:${GITHUB_SHA}
+          kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment the-project-dep --timeout=5m
+          kubectl rollout status deployment todo-backend-dep --timeout=5m
+          kubectl get services -o wide
 
-      - name: Restart frontend deployment
-        run: |-
-          kubectl rollout restart deployment/the-project-dep -n project
-          kubectl rollout status deployment/the-project-dep -n project --timeout=5m
-
-      - name: Restart backend deployment
-        run: |-
-          kubectl rollout restart deployment/todo-backend-dep -n project
-          kubectl rollout status deployment/todo-backend-dep -n project --timeout=5m
-
-      - name: Verify deployment
-        run: |-
-          kubectl get pods -n project
-          kubectl get gateway -n project
-          kubectl get httproute -n project

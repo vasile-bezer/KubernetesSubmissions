@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: todo-backend
-          image: europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project-backend:latest
+          image: the-project-backend
           imagePullPolicy: Always
           env:
             - name: PORT
