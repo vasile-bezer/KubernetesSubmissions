@@ -96,3 +96,16 @@ To create a new namespace for the app
 - kubectl delete deployment log-output-dep ping-pong-dep -n log-output-namespace
 - kubectl delete service,ingress --all -n log-output-namespace
 - 
+
+ # Gateway API
+
+- $ gcloud container clusters update dwk-cluster --location=europe-north1-b --gateway-api=standard
+- kubectl delete -f log_output/manifests-gke/ingress.yaml
+- kubectl apply -f log_output/manifests-gke/gateway.yaml
+- kubectl apply -f log_output/manifests-gke/route.yaml
+
+
+To debug
+
+- kubectl get gatewayclass
+- kubectl describe gateway my-gateway -n exercises
