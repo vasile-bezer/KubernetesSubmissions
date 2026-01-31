@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-output-dep
+  namespace: exercises
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-output
+  template:
+    metadata:
+      labels:
+        app: log-output
+    spec:
+      volumes:
+        - name: shared-logs
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: log-output-config
+            items:
+              - key: information.txt
+                path: information.txt
+      containers:
+        - name: log-output-writer
+          image: europe-north1-docker.pkg.dev/dwk-gke-485823/log-output/log-output-writer:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /app/logs
+        - name: log-output-reader
+          image: europe-north1-docker.pkg.dev/dwk-gke-485823/log-output/log-output-reader:latest
+          imagePullPolicy: Always
+          env:
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-config
+                  key: MESSAGE
+            - name: PING_PONG_URL
+              value: "http://ping-pong-svc:80/pings"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /app/logs
+            - name: config
+              mountPath: /app/config

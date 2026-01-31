@@ -21,19 +21,20 @@ class Handler(BaseHTTPRequestHandler):
 				file_content = f"Error reading config file: {e}"
 			
 			env_message = os.environ.get("MESSAGE", "")
+			ping_pong_url = os.environ.get("PING_PONG_URL", "http://ping-pong-svc:1234/pings")
 			
 			with open(log_file, "r") as f:
 				log_content = f.read().strip()
 			
 			ping_pong_count = 0
-			with urllib.request.urlopen("http://ping-pong-svc:1234/pings") as response:
+			with urllib.request.urlopen(ping_pong_url) as response:
 				ping_pong_count = response.read().decode('utf-8').strip()
 			
 			content = f"file content: {file_content}\n"
 			content += f"env variable: MESSAGE={env_message}\n"
 			content += f"{log_content}\n"
 			content += f"Ping / Pongs: {ping_pong_count}\n"
-			
+		
 		except Exception as e:
 			print("Exception:", e)
 			content = f"Error reading file: {e}\n"

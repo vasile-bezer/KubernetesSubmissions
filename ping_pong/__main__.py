@@ -47,6 +47,14 @@ def increment_counter():
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		
+		# Root path for Ingress health check
+		if self.path == "/":
+			self.send_response(200)
+			self.send_header("Content-Type", "text/plain; charset=utf-8")
+			self.end_headers()
+			self.wfile.write(b"OK\n")
+			return
+		
 		# Endpoint to just get the counter value without incrementing
 		if self.path == "/pings":
 			counter = get_counter()
@@ -56,13 +64,21 @@ class Handler(BaseHTTPRequestHandler):
 			self.wfile.write(str(counter).encode("utf-8"))
 			return
 		
-		# Default endpoint - increment and return pong
-		counter = increment_counter()
-		self.send_response(200)
+		# /pingpong endpoint - increment and return pong
+		if self.path == "/pingpong":
+			counter = increment_counter()
+			self.send_response(200)
+			self.send_header("Content-Type", "text/plain; charset=utf-8")
+			self.end_headers()
+			answer = f"pong {counter}\n"
+			self.wfile.write(answer.encode("utf-8"))
+			return
+		
+		# Default 404
+		self.send_response(404)
 		self.send_header("Content-Type", "text/plain; charset=utf-8")
 		self.end_headers()
-		answer = f"pong {counter}\n"
-		self.wfile.write(answer.encode("utf-8"))
+		self.wfile.write(b"Not Found\n")
 		return
 
 
