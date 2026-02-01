@@ -128,5 +128,48 @@ GitHub Secrets (in "the_project" environment):
 ## Automatic cleanup
 - Deleting a branch triggers automatic cleanup workflow (deletes the namespace and all Gateway, deployments, services, etc.)
 
+## DBaaS vs DIY
 
+DBaaS pros
+
+- Very fast and simple setup
+- No database installation or OS management
+- Automatic backups and point-in-time recovery
+- Built-in high availability and failover
+- Automatic patching and minor upgrades
+- Integrated monitoring, logging, and alerting
+- High reliability with minimal operational effort
+- Lower risk of data loss due to managed backups
+- Less DevOps and database expertise required
+
+DBaaS cons
+
+- Higher direct infrastructure cost
+- Limited control over database configuration
+- Vendor lock-in to Google Cloud
+- Less flexibility for custom extensions or tuning
+- Scaling options are more constrained
+- Backup customization is limited
+- DIY Postgres on GKE (PersistentVolumeClaims)
+
+DIY Pros
+
+- Full control over Postgres configuration and version
+- Ability to install any extensions or custom tooling
+- Potentially lower infrastructure cost
+- Uses existing Kubernetes infrastructure
+- No cloud-provider database lock-in
+- Highly customizable backup strategies
+- Easier to integrate advanced Postgres patterns if expertise exists
+
+DIY Cons
+
+- Higher setup complexity
+- Manual configuration of storage, StatefulSets, and networking
+- Backups must be designed, implemented, and tested manually
+- No built-in High Availability or failover without extra tooling
+- Ongoing maintenance and patching required
+- Higher operational risk and chance of misconfiguration
+- Requires strong Kubernetes and database expertise
+- Engineering time and operational costs can outweigh infra savings
 
