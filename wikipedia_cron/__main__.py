@@ -37,7 +37,7 @@ def add_todo_to_backend(todo_text):
     """
     POST a new todo to the backend service
     """
-    backend_url = os.environ.get("BACKEND_URL", "http://todo-backend-svc.project.svc.cluster.local:3001/todos")
+    backend_url = os.environ.get("BACKEND_URL", "http://todo-backend-svc:2345/todos")
     
     try:
         data = json.dumps({"todo": todo_text}).encode('utf-8')
