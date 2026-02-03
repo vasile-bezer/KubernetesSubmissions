@@ -14,5 +14,5 @@ spec:
             image: wikipedia-cron
             env:
             - name: BACKEND_URL
-              value: "http://todo-backend-svc:2345/todos"
+              value: "http://todo-backend-svc:80/todos"
           restartPolicy: OnFailure
