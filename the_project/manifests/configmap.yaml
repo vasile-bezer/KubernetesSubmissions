@@ -5,6 +5,7 @@ metadata:
   namespace: project
 data:
   BACKEND_URL: "/todos"
+  BACKEND_URL_INTERNAL: "http://todo-backend-svc:2345/todos"
   IMAGE_URL: "https://picsum.photos/1200"
   IMAGE_CACHE_MINUTES: "10"
   PORT: "3000"

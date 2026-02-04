@@ -32,6 +32,11 @@ spec:
                 configMapKeyRef:
                   name: the-project-config
                   key: BACKEND_URL
+            - name: BACKEND_URL_INTERNAL
+              valueFrom:
+                configMapKeyRef:
+                  name: the-project-config
+                  key: BACKEND_URL_INTERNAL
             - name: IMAGE_URL
               valueFrom:
                 configMapKeyRef:

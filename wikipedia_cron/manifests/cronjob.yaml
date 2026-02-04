@@ -5,7 +5,7 @@ metadata:
   namespace: project
 spec:
   # Run every hour
-  schedule: "0 * * * *"
+  schedule: "* * * * *"
   jobTemplate:
     spec:
       template:
@@ -16,5 +16,5 @@ spec:
             imagePullPolicy: Never
             env:
             - name: BACKEND_URL
-              value: "http://todo-backend-svc.project.svc.cluster.local:2345/todos"
+              value: "http://todo-backend-svc:2345/todos"
           restartPolicy: OnFailure
