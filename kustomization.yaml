@@ -19,6 +19,9 @@ resources:
   - the_project_backend/manifests-gke/secret.yaml
   - the_project_backend/manifests-gke/postgres-statefulset.yaml
   - the_project_backend/manifests-gke/postgres-init.yaml
+  
+  # Wikipedia CronJob
+  - wikipedia_cron/manifests-gke/cronjob.yaml
 
 images:
   - name: the-project-frontend
@@ -26,6 +29,9 @@ images:
     newTag: latest
   - name: the-project-backend
     newName: europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/the-project-backend
+    newTag: latest
+  - name: wikipedia-cron
+    newName: europe-north1-docker.pkg.dev/dwk-gke-485823/the-project/wikipedia-cron
     newTag: latest
 
 labels:

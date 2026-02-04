@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wikipedia-todo-cron
+spec:
+  # Run every 2 minutes
+  schedule: "*/2 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: wikipedia-todo
+            image: wikipedia-cron
+            env:
+            - name: BACKEND_URL
+              value: "http://todo-backend-svc:80/todos"
+          restartPolicy: OnFailure

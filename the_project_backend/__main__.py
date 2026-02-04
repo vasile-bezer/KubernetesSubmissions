@@ -9,7 +9,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 
 def get_db_connection():
 	return psycopg2.connect(
-		host=os.environ.get("POSTGRES_HOST", "todo-db-svc.project.svc.cluster.local"),
+		host=os.environ.get("POSTGRES_HOST", "todo-db-svc"),
 		database=os.environ.get("POSTGRES_DB", "tododb"),
 		user=os.environ.get("POSTGRES_USER", "todouser"),
 		password=os.environ.get("POSTGRES_PASSWORD", "todopassword")
