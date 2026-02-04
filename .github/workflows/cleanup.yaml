@@ -39,7 +39,8 @@ jobs:
 
       - name: Delete namespace
         run: |-
-          BRANCH_NAME="${GITHUB_EVENT_REF#refs/heads/}"
+          BRANCH_NAME="${{ github.event.ref }}"
+          BRANCH_NAME="${BRANCH_NAME#refs/heads/}"
           echo "Deleting namespace: $BRANCH_NAME"
           
           if [ "$BRANCH_NAME" = "main" ]; then
@@ -57,7 +58,8 @@ jobs:
 
       - name: Verify deletion
         run: |-
-          BRANCH_NAME="${GITHUB_EVENT_REF#refs/heads/}"
+          BRANCH_NAME="${{ github.event.ref }}"
+          BRANCH_NAME="${BRANCH_NAME#refs/heads/}"
           if [ "$BRANCH_NAME" != "main" ]; then
             kubectl get namespaces | grep -v "$BRANCH_NAME" || echo "✅ Confirmed: namespace $BRANCH_NAME is deleted"
           fi
