@@ -43,6 +43,12 @@ spec:
               mountPath: /app/logs
             - name: config-volume
               mountPath: /app/config
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 #          ports:                   for future reference
 #            - containerPort: 3000  for future reference
 #              name: http           for future reference

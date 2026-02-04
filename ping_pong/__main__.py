@@ -66,6 +66,26 @@ class Handler(BaseHTTPRequestHandler):
 			self.wfile.write(str(counter).encode("utf-8"))
 			return
 		
+		# Health check endpoint - checks database connectivity
+		if self.path == "/healthz":
+			try:
+				conn = get_db_connection()
+				cur = conn.cursor()
+				cur.execute("SELECT 1")
+				cur.close()
+				conn.close()
+				self.send_response(200)
+				self.send_header("Content-Type", "text/plain; charset=utf-8")
+				self.end_headers()
+				self.wfile.write(b"OK\n")
+			except Exception as e:
+				print(f"Health check failed: {e}")
+				self.send_response(503)
+				self.send_header("Content-Type", "text/plain; charset=utf-8")
+				self.end_headers()
+				self.wfile.write(f"Database connection failed: {e}\n".encode("utf-8"))
+			return
+		
 		# Default 404
 		self.send_response(404)
 		self.send_header("Content-Type", "text/plain; charset=utf-8")

@@ -116,3 +116,25 @@ To debug
 - docker push europe-north1-docker.pkg.dev/dwk-gke-485823/ping-pong/ping-pong:latest
 - kubectl apply -f /home/percy/Scrivania/KubernetesSubmissions/log_output/manifests-gke/route.yaml
 - kubectl rollout restart deployment ping-pong-dep -n exercises
+
+## Readiness probe
+
+- cd ping_pong && docker build -t ping_pong:latest .
+- cd log_output && docker build -f Dockerfile.reader -t log_output_reader:latest . && docker build -f Dockerfile.writer -t log_output_writer:latest .
+- k3d image import ping_pong:latest log_output_reader:latest log_output_writer:latest -c k3s-default
+- kubectl delete statefulset postgres-ss -n exercises
+- kubectl delete pod -n exercises --all
+- kubectl apply -f log_output/manifests/configmap.yaml
+- kubectl apply -f ping_pong/manifests/deployment.yaml
+- kubectl apply -f log_output/manifests/deployment.yaml
+
+- kubectl get po -n exercises
+
+- kubectl apply -f ping_pong/manifests/postgres-statefulset.yaml
+- kubectl get po -n exercises
+
+To debug:
+- kubectl describe pod <ping-pong-pod> -n exercises | grep -A 10 "Readiness"
+- kubectl describe pod <log-output-pod> -n exercises | grep -A 10 "Readiness"
+- kubectl logs <ping-pong-pod> -n exercises
+- kubectl logs <log-output-pod> -c log-reader -n exercises
