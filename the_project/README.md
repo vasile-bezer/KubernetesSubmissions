@@ -173,3 +173,15 @@ DIY Cons
 - Requires strong Kubernetes and database expertise
 - Engineering time and operational costs can outweigh infra savings
 
+## Readiness probe
+
+- cd the_project && docker build -t the_project:latest .
+- cd the_project_backend && docker build -t the_project_backend:latest .
+- k3d image import the_project:latest the_project_backend:latest -c k3s-default
+- kubectl apply -f the_project_backend/manifests/deployment-bad.yaml
+- kubectl get pods -n project
+- kubectl logs <todo-backend-pod> -n project
+- kubectl describe pod <todo-backend-pod> -n project | grep -A 10 "Events:"
+- kubectl apply -f the_project/manifests/deployment.yaml
+- kubectl apply -f the_project_backend/manifests/deployment.yaml
+- kubectl get pods -n project

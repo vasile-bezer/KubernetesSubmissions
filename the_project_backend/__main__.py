@@ -47,12 +47,24 @@ def add_todo(text):
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
-		# Health check endpoint for GKE load balancer
+		# Health check endpoint - checks database connectivity
 		if self.path == "/" or self.path == "/healthz":
-			self.send_response(200)
-			self.send_header("Content-Type", "text/plain")
-			self.end_headers()
-			self.wfile.write(b"OK")
+			try:
+				conn = get_db_connection()
+				cur = conn.cursor()
+				cur.execute("SELECT 1")
+				cur.close()
+				conn.close()
+				self.send_response(200)
+				self.send_header("Content-Type", "text/plain")
+				self.end_headers()
+				self.wfile.write(b"OK")
+			except Exception as e:
+				print(f"Health check failed: {e}")
+				self.send_response(503)
+				self.send_header("Content-Type", "text/plain")
+				self.end_headers()
+				self.wfile.write(f"Database connection failed: {e}\n".encode('utf-8'))
 			return
 		
 		if self.path == "/todos":

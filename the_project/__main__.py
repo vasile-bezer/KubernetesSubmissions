@@ -13,6 +13,7 @@ last_download_time = 0
 
 IMAGE_URL = os.environ.get("IMAGE_URL", "https://picsum.photos/1200")
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8081/todos")
+BACKEND_URL_INTERNAL = os.environ.get("BACKEND_URL_INTERNAL", BACKEND_URL)
 
 
 def download_new_image():
@@ -66,6 +67,22 @@ def get_image():
 
 class Handler(BaseHTTPRequestHandler):
 	def do_GET(self):
+		# Health check endpoint - checks backend connectivity
+		if self.path == "/healthz":
+			try:
+				with urllib.request.urlopen(BACKEND_URL_INTERNAL, timeout=5) as response:
+					response.read()
+				self.send_response(200)
+				self.send_header("Content-Type", "text/plain")
+				self.end_headers()
+				self.wfile.write(b"OK\n")
+			except Exception as e:
+				print(f"Health check failed: {e}")
+				self.send_response(503)
+				self.send_header("Content-Type", "text/plain")
+				self.end_headers()
+				self.wfile.write(f"Backend connection failed: {e}\n".encode('utf-8'))
+			return
 		
 		image_base64 = base64.b64encode(get_image()).decode('utf-8')
 		

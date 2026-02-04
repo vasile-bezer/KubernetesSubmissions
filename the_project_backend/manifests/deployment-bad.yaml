@@ -19,30 +19,15 @@ spec:
           imagePullPolicy: Never
           env:
             - name: PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: todo-backend-config
-                  key: PORT
+              value: "3001"
             - name: POSTGRES_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: todo-backend-config
-                  key: POSTGRES_HOST
+              value: "wrong-db-host"
             - name: POSTGRES_DB
-              valueFrom:
-                configMapKeyRef:
-                  name: todo-backend-config
-                  key: POSTGRES_DB
+              value: "tododb"
             - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: todo-db-secret
-                  key: POSTGRES_USER
+              value: "todouser"
             - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: todo-db-secret
-                  key: POSTGRES_PASSWORD
+              value: "wrongpassword"
           readinessProbe:
             httpGet:
               path: /healthz
